@@ -1,0 +1,13 @@
+server:
+  port: 8900
+
+spring:
+  application:
+    name: image-service
+
+  # H2 Database Property
+  datasource:
+    url: jdbc:h2:mem:testdb
+  h2:
+    console:
+      enabled: true
