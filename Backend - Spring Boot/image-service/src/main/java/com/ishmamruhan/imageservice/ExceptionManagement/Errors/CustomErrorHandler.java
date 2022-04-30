@@ -2,10 +2,14 @@ package com.ishmamruhan.imageservice.ExceptionManagement.Errors;
 
 import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
 import com.ishmamruhan.imageservice.ExceptionManagement.ErrorTemplate;
+import org.apache.tomcat.util.http.fileupload.impl.FileUploadIOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.io.FileNotFoundException;
 
 @ControllerAdvice
 public class CustomErrorHandler {
@@ -21,4 +25,23 @@ public class CustomErrorHandler {
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorTemplate);
     }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> multipartSizeExceddedErrorHandler(MaxUploadSizeExceededException ex){
+        return new ResponseEntity<>(new ErrorTemplate(HttpStatus.EXPECTATION_FAILED.value(),
+                ex.getMessage(), "Excedded Max Upload Size"),HttpStatus.EXPECTATION_FAILED);
+    }
+
+    @ExceptionHandler(FileUploadIOException.class)
+    public ResponseEntity<Object> inputOutputExceptionHandler(FileUploadIOException ex){
+        return new ResponseEntity<>(new ErrorTemplate(HttpStatus.SERVICE_UNAVAILABLE.value(),
+                ex.getMessage(), "I/O Exception Occurs"),HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<Object> fileNotFoundExceptionHandler2(FileNotFoundException ex){
+        return new ResponseEntity<>(new ErrorTemplate(HttpStatus.SERVICE_UNAVAILABLE.value(),
+                ex.getMessage(), "File Not Found"),HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
 }

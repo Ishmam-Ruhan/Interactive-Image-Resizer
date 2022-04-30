@@ -1,6 +1,7 @@
 package com.ishmamruhan.imageservice.Services;
 
 import com.ishmamruhan.imageservice.DTO.Image;
+import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,11 +18,11 @@ public interface ImageService {
     String saveAllImage(List<MultipartFile> files) throws MaxUploadSizeExceededException, IOException;
 
     // Retrive Image by image ID
-    Image getImage(long id);
+    Image getImage(long id) throws CustomError;
 
     // Get All Images
     List<Image> getAllImage();
 
     // Delete a image by ID
-    void deleteImage(long id);
+    String deleteImage(long id) throws CustomError;
 }

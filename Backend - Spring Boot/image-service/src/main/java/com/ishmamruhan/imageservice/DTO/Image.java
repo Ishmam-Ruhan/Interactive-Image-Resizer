@@ -24,7 +24,10 @@ public class Image {
     private String fileType;
 
     @Lob
-    private byte[] imageData;
+    private byte[] originalImageData;
+
+    @Lob
+    private byte[] thumbnileImageData;
 
     private String uploadedAt = DateGenerator.getDate();
 }

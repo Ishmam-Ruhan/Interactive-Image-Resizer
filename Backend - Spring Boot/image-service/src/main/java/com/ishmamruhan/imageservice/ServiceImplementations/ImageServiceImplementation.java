@@ -3,6 +3,7 @@ package com.ishmamruhan.imageservice.ServiceImplementations;
 import com.ishmamruhan.imageservice.DAO.ImageRepo;
 import com.ishmamruhan.imageservice.DTO.Image;
 import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
+import com.ishmamruhan.imageservice.Helpers.ImageResizer;
 import com.ishmamruhan.imageservice.Services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -24,13 +25,16 @@ public class ImageServiceImplementation implements ImageService {
     private ImageRepo imageRepo;
 
     @Override
-    public Image saveImage(MultipartFile file) throws MaxUploadSizeExceededException, IOException, CustomError {
+    public Image saveImage(MultipartFile file)
+            throws MaxUploadSizeExceededException, IOException, CustomError {
+
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         Image image = new Image();
 
         image.setFileType(file.getContentType());
-        image.setImageData(file.getBytes());
+        image.setOriginalImageData(file.getBytes());
+        image.setThumbnileImageData(ImageResizer.resizeImage(file));
         image.setImageFileName(fileName);
 
         try{
@@ -54,11 +58,12 @@ public class ImageServiceImplementation implements ImageService {
 
                     image.setFileType(file.getContentType());
                     try {
-                        image.setImageData(file.getBytes());
+                        image.setOriginalImageData(file.getBytes());
+                        image.setThumbnileImageData(ImageResizer.resizeImage(file));
                     } catch (IOException e) {
                         throw new CustomError(
                                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
-                                "Error While Processing Images.",
+                                "Error at 'Upload ALL' While Processing Images.",
                                 "Few Images are not processable!");
                     }
                     image.setImageFileName(StringUtils.cleanPath(file.getOriginalFilename()));
@@ -74,24 +79,49 @@ public class ImageServiceImplementation implements ImageService {
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.toString(),
-                    "Error Occured when uploading!");
+                    "Error Occured when upload all image!");
         }
 
         return "Successfully Saved All Images!";
     }
 
     @Override
-    public Image getImage(long id) {
-        return null;
+    public Image getImage(long id) throws CustomError{
+        Image image = null;
+
+        image = imageRepo.findById(id)
+                .orElseThrow(
+                        () -> new CustomError(
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.toString(),
+                                "Image Not Found with ID: "+id));
+
+        return  image;
     }
 
     @Override
     public List<Image> getAllImage() {
-        return null;
+        return imageRepo.findAll();
     }
 
     @Override
-    public void deleteImage(long id) {
+    public String deleteImage(long id) throws CustomError{
+        imageRepo.findById(id)
+                .orElseThrow(
+                        () -> new CustomError(
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.toString(),
+                                "Image Not Found with ID: "+id));
 
+        try{
+            imageRepo.deleteById(id);
+        }catch (Exception exception){
+            throw new CustomError(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+                    "Error Occured While Deleting Image!");
+        }
+
+        return "Successfully Deleted Image";
     }
 }
