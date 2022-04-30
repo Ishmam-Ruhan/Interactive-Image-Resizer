@@ -1,6 +1,9 @@
+
+# Set Up our application's listening PORT
 server:
   port: 8900
 
+# Application Name
 spring:
   application:
     name: image-service
@@ -11,3 +14,11 @@ spring:
   h2:
     console:
       enabled: true
+
+  # Setting up Multipart Max Requirments
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 3MB
+
+

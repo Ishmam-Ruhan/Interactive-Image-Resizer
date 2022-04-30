@@ -1,7 +1,7 @@
 package com.ishmamruhan.imageservice.ExceptionManagement.Errors;
 
-import com.ishmamruhan.UserService.ExceptionManagement.CustomError;
-import com.ishmamruhan.UserService.ExceptionManagement.ErrorTemplate;
+import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
+import com.ishmamruhan.imageservice.ExceptionManagement.ErrorTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
