@@ -26,6 +26,12 @@ public class CustomErrorHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorTemplate);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorTemplate> restExceptionHandler(Exception ex){
+        return new ResponseEntity<>(new ErrorTemplate(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",ex.getMessage() ),HttpStatus.EXPECTATION_FAILED);
+    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> multipartSizeExceddedErrorHandler(MaxUploadSizeExceededException ex){
         return new ResponseEntity<>(new ErrorTemplate(HttpStatus.EXPECTATION_FAILED.value(),
@@ -43,5 +49,6 @@ public class CustomErrorHandler {
         return new ResponseEntity<>(new ErrorTemplate(HttpStatus.SERVICE_UNAVAILABLE.value(),
                 ex.getMessage(), "File Not Found"),HttpStatus.SERVICE_UNAVAILABLE);
     }
+
 
 }
