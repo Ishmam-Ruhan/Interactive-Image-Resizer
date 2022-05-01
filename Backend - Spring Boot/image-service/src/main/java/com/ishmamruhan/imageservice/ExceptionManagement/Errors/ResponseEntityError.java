@@ -27,5 +27,4 @@ public class ResponseEntityError extends ResponseEntityExceptionHandler {
                 ex.getMessage(), "Method is not available! Check Proper Method!"),HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-
 }

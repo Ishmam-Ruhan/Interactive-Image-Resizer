@@ -5,6 +5,7 @@ import com.ishmamruhan.imageservice.DTO.Image;
 import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
 import com.ishmamruhan.imageservice.Helpers.ImageResizer;
 import com.ishmamruhan.imageservice.Services.ImageService;
+import com.ishmamruhan.imageservice.Services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,10 @@ public class ImageServiceImplementation implements ImageService {
     @Autowired
     private ImageRepo imageRepo;
 
+    @Autowired
+    private NotificationService notificationService;
+
+
     @Override
     public Image saveImage(MultipartFile file)
             throws MaxUploadSizeExceededException, IOException, CustomError {
@@ -40,6 +45,9 @@ public class ImageServiceImplementation implements ImageService {
         try{
             image = imageRepo.save(image);
         }catch (Exception e){
+
+            notificationService.sendNotification(400);
+
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.toString(),
@@ -61,6 +69,9 @@ public class ImageServiceImplementation implements ImageService {
                         image.setOriginalImageData(file.getBytes());
                         image.setThumbnileImageData(ImageResizer.resizeImage(file));
                     } catch (IOException e) {
+
+                        notificationService.sendNotification(400);
+
                         throw new CustomError(
                                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
                                 "Error at 'Upload ALL' While Processing Images.",
@@ -76,6 +87,9 @@ public class ImageServiceImplementation implements ImageService {
         try{
             imageRepo.saveAll(images);
         }catch (Exception e){
+
+            notificationService.sendNotification(400);
+
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.toString(),
@@ -116,6 +130,9 @@ public class ImageServiceImplementation implements ImageService {
         try{
             imageRepo.deleteById(id);
         }catch (Exception exception){
+
+            notificationService.sendNotification("Cannot Delete Image.");
+
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.toString(),

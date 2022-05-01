@@ -4,6 +4,7 @@ import com.ishmamruhan.imageservice.DTO.Image;
 import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
 import com.ishmamruhan.imageservice.Helpers.Response;
 import com.ishmamruhan.imageservice.Services.ImageService;
+import com.ishmamruhan.imageservice.Services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,9 @@ public class MainController {
     @Autowired
     private ImageService imageService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @PostMapping("/image/upload")
     public ResponseEntity<Response> saveImage(@RequestParam("file") MultipartFile multipartFile)
             throws MaxUploadSizeExceededException, IOException, CustomError {
@@ -34,7 +38,9 @@ public class MainController {
                 image.getImageFileName(),
                 " Image \""+image.getImageFileName()+"\" successfully saved with id - "+image.getId()+" at "+image.getUploadedAt());
 
-        return ResponseEntity.ok(response);
+        notificationService.sendNotification(200);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/image/upload/all")
@@ -44,8 +50,9 @@ public class MainController {
         imageService
                 .saveAllImage(multipartFiles) ;
 
+        notificationService.sendNotification(200);
 
-        return ResponseEntity.ok("All Images Saved Successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body("All Images Saved Successfully");
     }
 
     @GetMapping("/image/get/all")
@@ -60,7 +67,12 @@ public class MainController {
 
     @DeleteMapping("/image/delete/{id}")
     public ResponseEntity<String> deleteImageById(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(imageService.deleteImage(id));
+
+        String message = imageService.deleteImage(id);
+
+        notificationService.sendNotification("Remove Image Successfully.");
+
+        return ResponseEntity.status(HttpStatus.OK).body(message);
     }
 
 }
