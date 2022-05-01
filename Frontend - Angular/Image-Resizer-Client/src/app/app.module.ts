@@ -3,10 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { DragDropDirective } from './Utilities/drag-drop.directive';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DragDropDirective
   ],
   imports: [
     BrowserModule,
