@@ -1,0 +1,56 @@
+
+
+
+
+<div>
+    <div class="dropzone" DragDrop (filesChangeEmiter)="imageDragDropUpload($event, $event)"> 
+        <div class="text-wrapper">
+            <div class="centered">
+                <input type="file" name="file" id="file" (change)="imageUpload($event)" accept="image/png, image/gif, image/jpeg, image/jpg" multiple=false>
+                <label for="file"><span class="textLink">Select Images</span> or Drop them here!</label> <br>
+                <span *ngIf="error != undefined "> <br> </span>
+                <span style="color: red; padding-top: 30px;">{{error}}</span>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<div class="table-content">
+    <br>
+    <h3 class="display-5" style="font-family:cursive;">Image List</h3>
+    <br>
+</div>
+
+<div class="container">
+    <div class="row">
+      <div class="col-12">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th scope="col" class="text-center">#</th>
+              <th scope="col"  class="text-center">Thumbnail</th>
+              <th scope="col"  class="text-center">Image Name</th>
+              <th scope="col"  class="text-center">Type</th>
+              <th scope="col"  class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody >
+            
+            <tr *ngFor = "let data of allImages">
+              <th scope="row" class = "table-item"> {{ data.id }} </th>
+              <th scope="row" class = "table-item">{{data.imageFileName}}</th>
+              <td class = "table-item">{{data.imageFileName}} </td>
+              <td class = "table-item">{{data.fileType}}</td>
+              <td>
+                <button type="button" class="btn btn-primary" style="margin-right: 3px; width: 65px; height: 35px;"><i class="fa fa-eye"></i></button>
+                
+                <button type="button" class="btn btn-danger" style="width: 65px; height: 35px;"><i class="fa fa-trash"></i></button>
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
