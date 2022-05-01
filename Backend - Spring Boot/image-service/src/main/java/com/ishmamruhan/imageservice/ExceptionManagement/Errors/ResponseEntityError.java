@@ -22,9 +22,18 @@ import java.util.Map;
 public class ResponseEntityError extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return new ResponseEntity<>(new ErrorTemplate(HttpStatus.METHOD_NOT_ALLOWED.value(),
-                ex.getMessage(), "Method is not available! Check Proper Method!"),HttpStatus.METHOD_NOT_ALLOWED);
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+
+        return new ResponseEntity<>(
+                new ErrorTemplate(
+                        HttpStatus.METHOD_NOT_ALLOWED.value(),
+                        ex.getMessage(),
+                        "Method is not available! Check Proper Method!"),
+                HttpStatus.METHOD_NOT_ALLOWED);
     }
 
 }
