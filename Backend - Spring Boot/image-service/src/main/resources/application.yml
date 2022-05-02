@@ -1,21 +1,39 @@
 
-# Set Up our application's listening PORT
+# *** Set Up our application's listening PORT ***
 server:
   port: 8900
 
-# Application Name
+#  *** Application Name ***
 spring:
   application:
     name: image-service
 
-  # H2 Database Property
-  datasource:
-    url: jdbc:h2:mem:testdb
-  h2:
-    console:
-      enabled: true
+# *** H2 Database Property ***
+#  datasource:
+#    url: jdbc:h2:mem:testdb
+#  h2:
+#    console:
+#      enabled: true
 
-  # Setting up Multipart Max Requirments
+# *** MySQL Database Property ***
+  datasource:
+    url: jdbc:mysql://localhost:3306/image_service?autoReconnect=true&allowPublicKeyRetrieval=true&&useSSL=false
+    username: root
+    password:
+
+
+# *** JPA Database Property ***
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+
+# *** Setting up Multipart Max Requirments ***
   servlet:
     multipart:
       max-file-size: 3MB
