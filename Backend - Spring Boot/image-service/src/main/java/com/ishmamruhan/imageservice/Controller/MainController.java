@@ -62,7 +62,18 @@ public class MainController {
 
     @GetMapping("/image/get/{id}")
     public ResponseEntity<Image> getImageById(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(imageService.getImage(id));
+
+        Image image = imageService.getImage(id);
+
+//        return ResponseEntity.status(HttpStatus.OK).body(
+//                new Image(
+//                        image.getId(),
+//                        image.getImageFileName(),
+//                        image.getFileType(),
+//                        image.getOriginalImageData(),
+//                        image.getThumbnileImageData(),
+//                        image.getUploadedAt()));
+        return ResponseEntity.status(HttpStatus.OK).body(image);
     }
 
     @DeleteMapping("/image/delete/{id}")

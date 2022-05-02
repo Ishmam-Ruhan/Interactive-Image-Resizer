@@ -18,7 +18,7 @@ export class ImageServiceService {
 
   imageData : any = [];
  
-  constructor(private httpClient : HttpClient) { }
+  constructor(private httpClient : HttpClient) {   }
 
 
   uploadImage(data : any){
@@ -30,12 +30,21 @@ export class ImageServiceService {
     );
   }
 
-  getAllImages(){
+  getAllImages() : any{
     
     this.imageData =  this.httpClient.get(baseUrl+"/image/get/all");
 
      console.log("Image Data from service; "+this.imageData);
      return this.imageData;
+  }
+
+  deleteImage(id: any){
+
+    this.httpClient.delete(baseUrl+"/image/delete/"+id,{ observe: 'response', responseType: 'text'})
+      .subscribe((response) => {
+        console.log(response.status);
+      }
+    );
   }
 
 }

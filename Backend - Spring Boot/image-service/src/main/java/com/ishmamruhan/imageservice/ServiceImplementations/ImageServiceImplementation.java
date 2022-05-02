@@ -3,6 +3,8 @@ package com.ishmamruhan.imageservice.ServiceImplementations;
 import com.ishmamruhan.imageservice.DAO.ImageRepo;
 import com.ishmamruhan.imageservice.DTO.Image;
 import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
+import com.ishmamruhan.imageservice.Helpers.ImageCompressor;
+import com.ishmamruhan.imageservice.Helpers.ImageDeCompresssor;
 import com.ishmamruhan.imageservice.Helpers.ImageResizer;
 import com.ishmamruhan.imageservice.Services.ImageService;
 import com.ishmamruhan.imageservice.Services.NotificationService;
@@ -38,8 +40,8 @@ public class ImageServiceImplementation implements ImageService {
         Image image = new Image();
 
         image.setFileType(file.getContentType());
-        image.setOriginalImageData(file.getBytes());
-        image.setThumbnileImageData(ImageResizer.resizeImage(file));
+        image.setOriginalImageData(ImageCompressor.compress(file.getBytes()));
+        image.setThumbnileImageData(ImageCompressor.compress(ImageResizer.resizeImage(file)));
         image.setImageFileName(fileName);
 
         try{
@@ -66,8 +68,8 @@ public class ImageServiceImplementation implements ImageService {
 
                     image.setFileType(file.getContentType());
                     try {
-                        image.setOriginalImageData(file.getBytes());
-                        image.setThumbnileImageData(ImageResizer.resizeImage(file));
+                        image.setOriginalImageData(ImageCompressor.compress(file.getBytes()));
+                        image.setThumbnileImageData(ImageCompressor.compress(ImageResizer.resizeImage(file)));
                     } catch (IOException e) {
 
                         notificationService.sendNotification(400);
@@ -110,12 +112,23 @@ public class ImageServiceImplementation implements ImageService {
                                 HttpStatus.NOT_FOUND.toString(),
                                 "Image Not Found with ID: "+id));
 
+
+        image.setOriginalImageData(ImageDeCompresssor.decompress(image.getOriginalImageData()));
+        image.setThumbnileImageData(ImageDeCompresssor.decompress(image.getThumbnileImageData()));
+
         return  image;
     }
 
     @Override
     public List<Image> getAllImage() {
-        return imageRepo.findAll();
+
+        return imageRepo.findAll().stream()
+                .map(img -> {
+                    img.setOriginalImageData(ImageDeCompresssor.decompress(img.getOriginalImageData()));
+                    img.setThumbnileImageData(ImageDeCompresssor.decompress(img.getThumbnileImageData()));
+                    return img;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -31,21 +31,21 @@
               <th scope="col" class="text-center">#</th>
               <th scope="col"  class="text-center">Thumbnail</th>
               <th scope="col"  class="text-center">Image Name</th>
-              <th scope="col"  class="text-center">Type</th>
+              <th scope="col"  class="text-center">Uploaded</th>
               <th scope="col"  class="text-center">Actions</th>
             </tr>
           </thead>
           <tbody >
             
-            <tr *ngFor = "let data of allImages">
+            <tr *ngFor = "let data of allData">
               <th scope="row" class = "table-item"> {{ data.id }} </th>
-              <th scope="row" class = "table-item">{{data.imageFileName}}</th>
-              <td class = "table-item">{{data.imageFileName}} </td>
-              <td class = "table-item">{{data.fileType}}</td>
+              <th scope="row" class = "table-item"> <img [src]="data.resizedImage" width="50" height="50"> </th>
+              <td class = "table-item">{{data.name}} </td>
+              <td class = "table-item">{{data.upload}}</td>
               <td>
-                <button type="button" class="btn btn-primary" style="margin-right: 3px; width: 65px; height: 35px;"><i class="fa fa-eye"></i></button>
+                <button type="button" (click)="showImage(data.id)" class="btn btn-primary" style="margin-right: 3px; width: 65px; height: 35px;" ><i class="fa fa-eye"></i></button>
                 
-                <button type="button" class="btn btn-danger" style="width: 65px; height: 35px;"><i class="fa fa-trash"></i></button>
+                <button type="button" class="btn btn-danger" style="width: 65px; height: 35px;" (click)="deleteImage(data.id)"><i class="fa fa-trash"></i></button>
               </td>
             </tr>
             

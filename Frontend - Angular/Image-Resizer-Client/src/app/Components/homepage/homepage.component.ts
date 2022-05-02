@@ -1,5 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Data } from '@angular/router';
+import { BehaviorSubject, interval, Observable } from 'rxjs';
 import { ImageServiceService } from 'src/app/Services/image-service.service';
 import { WebSocketService } from 'src/app/Services/web-socket.service';
 import { WebSocketAPI } from 'src/app/Utilities/WebSocketAPI';
@@ -9,8 +11,14 @@ import { WebSocketAPI } from 'src/app/Utilities/WebSocketAPI';
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.css']
 })
+
+
+
+
+
 export class HomepageComponent implements OnInit {
 
+ 
 
   files : any[]=[];
 
@@ -22,21 +30,45 @@ export class HomepageComponent implements OnInit {
 
   allImages : any = [];
 
+  allData : data[] = [];
 
-  constructor(private imageService : ImageServiceService) { }
+  constructor(private imageService : ImageServiceService, private cd: ChangeDetectorRef) { 
+    
+  }
   
 
   ngOnInit(): void {
+    interval(200).subscribe(x =>{
+      this.getAllImages();
+    })
+
+    this.cd.detectChanges();
     this.webSocket = new WebSocketAPI(this);
     this.webSocket._connect();
-    this.getAllImages();
   }
 
   getAllImages(){
     this.imageService.getAllImages().subscribe((res : any) => this.allImages = res);
-
     
-    console.log(this.allImages);
+    this.allData = [];
+
+    console.log("CALLED FUNCTION!!!!!!");
+
+    for(let i = 0; i < this.allImages.length; i++){
+      const id = this.allImages[i].id;
+      const name = this.allImages[i].imageFileName;
+      const fileType = this.allImages[i].fileType;
+      const originalImage = this.allImages[i].originalImageData;
+      const resizedImage = this.allImages[i].thumbnileImageData;
+      const uploadAt = this.allImages[i].uploadedAt;
+
+      const mainData = "data:"+fileType+";base64,"+resizedImage;
+
+      this.allData.push(new data(id,name,fileType,originalImage,mainData,uploadAt));
+    }
+
+    this.cd.detectChanges();
+    //console.log(typeof(this.allImages.thumbnileImageData));
   }
 
 
@@ -94,6 +126,16 @@ export class HomepageComponent implements OnInit {
     return false;
   }
 
+  deleteImage(id : any){
+    this.imageService.deleteImage(id);
+    this.getAllImages();
+    console.log("Delete photo with id: "+id)
+  }
+
+  showImage(id : any){
+    
+  }
+
   handleMessage(message : any){
     const splits = message.split("\\\"",7);
     this.notification = splits[3];
@@ -105,8 +147,28 @@ export class HomepageComponent implements OnInit {
     //console.log("Notification value: "+data+"  msg: "+msg);
     // this.showSuccess(message);
     // this.handleToast(data,msg);
+    this.getAllImages();
   }
 
 
+
+}
+
+class data{
+  id : any;
+  name : any;
+  fileType: any;
+  originalImage : any;
+  resizedImage: any;
+  upload: any;
+
+  constructor(id: any, name: any, fileType: any,originalImage: any,resizedImage: any,upload: any){
+    this.id = id;
+    this.name = name;
+    this.fileType = fileType;
+    this.originalImage = originalImage;
+    this.resizedImage = resizedImage;
+    this.upload = upload;
+  }
 
 }
