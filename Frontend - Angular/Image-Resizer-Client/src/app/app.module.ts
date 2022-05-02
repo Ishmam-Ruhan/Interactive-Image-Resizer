@@ -8,13 +8,17 @@ import { HomepageComponent } from './Components/homepage/homepage.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ToastComponent } from './Components/toast/toast.component';
+import { ShowImageComponent } from './Components/show-image/show-image.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     DragDropDirective,
-    HomepageComponent
+    HomepageComponent,
+    ToastComponent,
+    ShowImageComponent
   ],
   imports: [
     BrowserModule,

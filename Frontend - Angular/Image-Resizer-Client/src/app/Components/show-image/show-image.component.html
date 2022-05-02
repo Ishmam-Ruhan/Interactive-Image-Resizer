@@ -1,0 +1,9 @@
+<div *ngIf="open" class="viewer-container">
+    <div class="viewer-content">
+      <a class="close-button" (click)="close.emit()">
+          <i class="fa fa-angle-left fa-2x" style="margin-right: 10px; margin-top: 8px;"></i>
+          <span>Go back</span>
+      </a>
+    <img class="main-img" [src]="imageURL" />
+    </div>
+  </div>

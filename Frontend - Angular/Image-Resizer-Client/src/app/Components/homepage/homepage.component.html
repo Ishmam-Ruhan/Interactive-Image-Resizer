@@ -1,7 +1,6 @@
 
 
 
-
 <div>
     <div class="dropzone" DragDrop (filesChangeEmiter)="imageDragDropUpload($event, $event)"> 
         <div class="text-wrapper">
@@ -43,7 +42,7 @@
               <td class = "table-item">{{data.name}} </td>
               <td class = "table-item">{{data.upload}}</td>
               <td>
-                <button type="button" (click)="showImage(data.id)" class="btn btn-primary" style="margin-right: 3px; width: 65px; height: 35px;" ><i class="fa fa-eye"></i></button>
+                <button type="button" (click)="showImage(data.originalImage)" class="btn btn-primary" style="margin-right: 3px; width: 65px; height: 35px;" ><i class="fa fa-eye"></i></button>
                 
                 <button type="button" class="btn btn-danger" style="width: 65px; height: 35px;" (click)="deleteImage(data.id)"><i class="fa fa-trash"></i></button>
               </td>
@@ -54,3 +53,7 @@
       </div>
     </div>
   </div>
+
+  <app-toast aria-live="polite" aria-atomic="true"></app-toast>
+
+  <app-show-image [imageURL]="imageURL" [open]="viewerOpen" (close)="viewerOpen = false"></app-show-image>
