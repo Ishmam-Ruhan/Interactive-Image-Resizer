@@ -18,6 +18,8 @@ services:
       interval: 1s
       retries: 15
 
+    networks:
+      - image_network
 
   mysqldb:
     
@@ -33,15 +35,14 @@ services:
     
     ports:
       - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
-    
-    volumes:
-      - $PWD/db:/var/lib/mysql
-    
+        
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 30s
-      interval: 1s
-      retries: 10
+      retries: 15
+
+    networks:
+      - image_network
 
 
   backend:
@@ -69,6 +70,8 @@ services:
       spring.jpa.hibernate.ddl-auto : update
       spring.rabbitmq.host: rabbit
 
+    networks:
+      - image_network
 
   frontend:
     
@@ -81,3 +84,10 @@ services:
     
     ports:
       - $ANGULAR_LOCAL_PORT:$ANGULAR_DOCKER_PORT
+    
+    networks:
+      - image_network
+
+
+networks:
+  image_network: {}
