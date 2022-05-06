@@ -2,7 +2,9 @@ package com.ishmamruhan.imageservice.Controller;
 
 import com.ishmamruhan.imageservice.DTO.Image;
 import com.ishmamruhan.imageservice.ExceptionManagement.CustomError;
+import com.ishmamruhan.imageservice.Helpers.DateGenerator;
 import com.ishmamruhan.imageservice.Helpers.Response;
+import com.ishmamruhan.imageservice.Services.ImageEventPublisher;
 import com.ishmamruhan.imageservice.Services.ImageService;
 import com.ishmamruhan.imageservice.Services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
 public class MainController {
+
+    @Autowired
+    private ImageEventPublisher imageEventPublisher;
+
     @Autowired
     private ImageService imageService;
 
@@ -25,34 +32,45 @@ public class MainController {
     private NotificationService notificationService;
 
     @PostMapping("/image/upload")
-    public ResponseEntity<Response> saveImage(@RequestParam("file") MultipartFile multipartFile)
+    public ResponseEntity<String> saveImage(@RequestParam("file") MultipartFile multipartFile)
             throws MaxUploadSizeExceededException, IOException, CustomError {
 
-        Image image = null;
+        Image image = new Image();
+        image.setId(UUID.randomUUID().toString());
+        image.setImageFileName(multipartFile.getOriginalFilename());
+        image.setOriginalImageData(multipartFile.getBytes());
+        image.setFileType(multipartFile.getContentType());
+        image.setUploadedAt(DateGenerator.getDate());
 
-        image = imageService
-                .saveImage(multipartFile) ;
+        imageEventPublisher.publishImageToSave(image);
 
-        Response response = new Response(
-                image.getId(),
-                image.getImageFileName(),
-                " Image \""+image.getImageFileName()+"\" successfully saved with id - "+image.getId()+" at "+image.getUploadedAt());
+        notificationService.sendInfoNotification("Processing....");
 
-        notificationService.sendNotification(200);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Image Sent to processing...");
     }
 
     @PostMapping("/image/upload/all")
     public ResponseEntity<String> saveImage(@RequestParam("file") List<MultipartFile> multipartFiles)
             throws MaxUploadSizeExceededException, IOException {
 
-        imageService
-                .saveAllImage(multipartFiles) ;
+        multipartFiles.forEach(multipartFile -> {
+            Image image = new Image();
+            image.setId(UUID.randomUUID().toString());
+            image.setImageFileName(multipartFile.getOriginalFilename());
+            try {
+                image.setOriginalImageData(multipartFile.getBytes());
+            } catch (IOException e) {
+                throw new CustomError(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.toString(),e.getMessage());
+            }
+            image.setFileType(multipartFile.getContentType());
+            image.setUploadedAt(DateGenerator.getDate());
 
-        notificationService.sendNotification(200);
+            imageEventPublisher.publishImageToSave(image);
+        });
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("All Images Saved Successfully");
+        notificationService.sendInfoNotification("Processing Images..");
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("All Images Sent to Process Successfully");
     }
 
     @GetMapping("/image/get/all")
@@ -61,29 +79,21 @@ public class MainController {
     }
 
     @GetMapping("/image/get/{id}")
-    public ResponseEntity<Image> getImageById(@PathVariable long id) {
+    public ResponseEntity<Image> getImageById(@PathVariable String id) {
 
         Image image = imageService.getImage(id);
 
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                new Image(
-//                        image.getId(),
-//                        image.getImageFileName(),
-//                        image.getFileType(),
-//                        image.getOriginalImageData(),
-//                        image.getThumbnileImageData(),
-//                        image.getUploadedAt()));
         return ResponseEntity.status(HttpStatus.OK).body(image);
     }
 
     @DeleteMapping("/image/delete/{id}")
-    public ResponseEntity<String> deleteImageById(@PathVariable long id) {
+    public ResponseEntity<String> deleteImageById(@PathVariable String id) {
 
-        String message = imageService.deleteImage(id);
+        imageService.deleteImage(id);
 
-        notificationService.sendNotification("Remove Image Successfully.");
+        notificationService.sendErrorNotification("Remove Success!");
 
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body("Image deleted successfully!");
     }
 
 }

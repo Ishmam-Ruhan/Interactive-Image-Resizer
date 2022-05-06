@@ -42,7 +42,7 @@ export class HomepageComponent implements OnInit {
   
 
   ngOnInit(): void {
-    interval(200).subscribe(x =>{
+    interval(1000).subscribe(x =>{
       this.getAllImages();
     })
 
@@ -87,8 +87,6 @@ export class HomepageComponent implements OnInit {
       this.imageService.uploadImage(formData);
 
       this.getAllImages();
-    }else{
-      this.error = "Please Upload Valid Image File."
     }
 
   }
@@ -103,8 +101,6 @@ export class HomepageComponent implements OnInit {
       this.imageService.uploadImage(formData);
 
       this.getAllImages();
-    }else{
-      this.error = "Please Upload Valid Image File."
     }
 
   }
@@ -149,27 +145,34 @@ export class HomepageComponent implements OnInit {
     const code = separateDate[1];
     const msg = separateDate[0];
 
-    //console.log("Notification value: "+data+"  msg: "+msg);
-    // this.showSuccess(message);
     this.handleToast(code,msg);
     this.getAllImages();
   }
 
   handleToast(code: any, msg: any){
-    if(code == 200){
+    
+    if(code == 100){
+      this.showInfo(msg);
+    }
+    else if(code == 200){
       this.showSuccess(msg);
-    }else{
+    }
+    else if(code == 400){
       this.showError(msg);
     }
+    
   }
 
+  showInfo(msg: any) {
+    this.toastService.show(msg, { classname: 'bg-info text-light', delay: 4000 });
+  }
 
   showSuccess(msg : any) {
-    this.toastService.show(msg, { classname: 'bg-success text-light', delay: 5000 });
+    this.toastService.show(msg, { classname: 'bg-success text-light', delay: 4000 });
   }
 
   showError(msg: any) {
-    this.toastService.show(msg, { classname: 'bg-danger text-light', delay: 5000 });
+    this.toastService.show(msg, { classname: 'bg-danger text-light', delay: 4000 });
   }
 
 }

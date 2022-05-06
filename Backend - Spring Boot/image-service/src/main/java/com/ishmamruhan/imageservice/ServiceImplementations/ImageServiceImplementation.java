@@ -32,23 +32,23 @@ public class ImageServiceImplementation implements ImageService {
 
 
     @Override
-    public Image saveImage(MultipartFile file)
+    public String saveImage(Image image)
             throws MaxUploadSizeExceededException, IOException, CustomError {
 
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        Image mainImage = new Image();
+        mainImage.setId(image.getId());
+        mainImage.setImageFileName(image.getImageFileName());
+        mainImage.setFileType(image.getFileType());
+        mainImage.setOriginalImageData(ImageCompressor.compress(image.getOriginalImageData()));
+        mainImage.setThumbnileImageData(ImageCompressor.compress(ImageResizer.resizeImage(image.getOriginalImageData())));
 
-        Image image = new Image();
-
-        image.setFileType(file.getContentType());
-        image.setOriginalImageData(ImageCompressor.compress(file.getBytes()));
-        image.setThumbnileImageData(ImageCompressor.compress(ImageResizer.resizeImage(file)));
-        image.setImageFileName(fileName);
+        notificationService.sendInfoNotification("Resize Done!");
 
         try{
-            image = imageRepo.save(image);
+            image = imageRepo.save(mainImage);
         }catch (Exception e){
 
-            notificationService.sendNotification(400);
+            notificationService.sendErrorNotification("Upload Failed!");
 
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -56,7 +56,8 @@ public class ImageServiceImplementation implements ImageService {
                     "Error Occured when uploading!");
         }
 
-        return image;
+        notificationService.sendSuccessNotification("Upload Success!");
+        return "Uploaded!";
     }
 
     @Override
@@ -72,7 +73,7 @@ public class ImageServiceImplementation implements ImageService {
                         image.setThumbnileImageData(ImageCompressor.compress(ImageResizer.resizeImage(file)));
                     } catch (IOException e) {
 
-                        notificationService.sendNotification(400);
+                        notificationService.sendErrorNotification("Resize Failed!");
 
                         throw new CustomError(
                                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
@@ -90,7 +91,7 @@ public class ImageServiceImplementation implements ImageService {
             imageRepo.saveAll(images);
         }catch (Exception e){
 
-            notificationService.sendNotification(400);
+            notificationService.sendErrorNotification("Upload Failed!");
 
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -102,7 +103,7 @@ public class ImageServiceImplementation implements ImageService {
     }
 
     @Override
-    public Image getImage(long id) throws CustomError{
+    public Image getImage(String id) throws CustomError{
         Image image = null;
 
         image = imageRepo.findById(id)
@@ -132,7 +133,7 @@ public class ImageServiceImplementation implements ImageService {
     }
 
     @Override
-    public String deleteImage(long id) throws CustomError{
+    public String deleteImage(String id) throws CustomError{
         imageRepo.findById(id)
                 .orElseThrow(
                         () -> new CustomError(
@@ -144,7 +145,7 @@ public class ImageServiceImplementation implements ImageService {
             imageRepo.deleteById(id);
         }catch (Exception exception){
 
-            notificationService.sendNotification("Cannot Delete Image.");
+            notificationService.sendErrorNotification("Delete not possible right now!");
 
             throw new CustomError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),

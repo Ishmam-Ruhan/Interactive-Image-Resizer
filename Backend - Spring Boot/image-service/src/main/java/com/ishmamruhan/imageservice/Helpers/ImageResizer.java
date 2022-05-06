@@ -9,6 +9,24 @@ import java.io.IOException;
 
 public class ImageResizer {
 
+    public static byte[] resizeImage(byte[] arr) throws IOException {
+
+        ByteArrayInputStream inputStream =
+                new ByteArrayInputStream(arr);
+
+        ByteArrayOutputStream outputStream =
+                new ByteArrayOutputStream();
+
+        Thumbnails.of(inputStream)
+                .size(200,200)
+                .outputFormat("JPEG")
+                .outputQuality(1)
+                .toOutputStream(outputStream);
+
+
+        return outputStream.toByteArray();
+    }
+
     public static byte[] resizeImage(MultipartFile file) throws IOException {
 
         ByteArrayInputStream inputStream =

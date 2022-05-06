@@ -40,7 +40,7 @@ public class CustomErrorHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> multipartSizeExceddedErrorHandler(MaxUploadSizeExceededException ex){
 
-        notificationService.sendNotification("Maximum file size excedded!");
+        notificationService.sendErrorNotification("Maximum file size excedded!");
 
         return new ResponseEntity<>(new ErrorTemplate(HttpStatus.EXPECTATION_FAILED.value(),
                 ex.getMessage(), "Excedded Max Upload Size"),HttpStatus.EXPECTATION_FAILED);
@@ -55,7 +55,7 @@ public class CustomErrorHandler {
     @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<Object> fileNotFoundExceptionHandler2(FileNotFoundException ex){
 
-        notificationService.sendNotification("File cannot processable! Try Again.");
+        notificationService.sendErrorNotification("File cannot processable! Try Again.");
 
         return new ResponseEntity<>(new ErrorTemplate(HttpStatus.SERVICE_UNAVAILABLE.value(),
                 ex.getMessage(), "File Not Found"),HttpStatus.SERVICE_UNAVAILABLE);

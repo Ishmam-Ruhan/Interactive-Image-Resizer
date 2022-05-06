@@ -7,8 +7,6 @@
             <div class="centered">
                 <input type="file" name="file" id="file" (change)="imageUpload($event)" accept="image/png, image/gif, image/jpeg, image/jpg" multiple=false>
                 <label for="file"><span class="textLink">Select Images</span> or Drop them here!</label> <br>
-                <span *ngIf="error != undefined "> <br> </span>
-                <span style="color: red; padding-top: 30px;">{{error}}</span>
             </div>
         </div>
     </div>
@@ -36,8 +34,8 @@
           </thead>
           <tbody >
             
-            <tr *ngFor = "let data of allData">
-              <th scope="row" class = "table-item"> {{ data.id }} </th>
+            <tr *ngFor = "let data of allData; index as i">
+              <th scope="row" class = "table-item"> {{ 1+i }} </th>
               <th scope="row" class = "table-item"> <img [src]="data.resizedImage" width="50" height="50"> </th>
               <td class = "table-item">{{data.name}} </td>
               <td class = "table-item">{{data.upload}}</td>

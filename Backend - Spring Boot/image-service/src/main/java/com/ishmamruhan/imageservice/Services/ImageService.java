@@ -12,17 +12,17 @@ import java.util.List;
 @Service
 public interface ImageService {
     // Saving single Image to Database
-    Image saveImage(MultipartFile file) throws MaxUploadSizeExceededException, IOException;
+    String saveImage(Image image) throws MaxUploadSizeExceededException, IOException;
 
     // Saving Multiple Image to Database
     String saveAllImage(List<MultipartFile> files) throws MaxUploadSizeExceededException, IOException;
 
     // Retrive Image by image ID
-    Image getImage(long id) throws CustomError;
+    Image getImage(String id) throws CustomError;
 
     // Get All Images
     List<Image> getAllImage();
 
     // Delete a image by ID
-    String deleteImage(long id) throws CustomError;
+    String deleteImage(String id) throws CustomError;
 }

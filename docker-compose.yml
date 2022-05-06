@@ -1,43 +1,83 @@
 version: "3.8"
 
 services:
-  
-  mysqldb:
-    image: mysql:latest
-    restart: unless-stopped
+
+  rabbit:
+    
+    image: rabbitmq:3.7.8-management
+    
     env_file: .env
+    
+    ports:
+      - $RABBIT_LOCAL_PORT:$RABBIT_DOCKER_PORT
+      - $RABBIT_LOCAL_MANAGEMENT_PORT:$RABBIT_DOCKER_MANAGEMENT_PORT
+   
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      timeout: 30s
+      interval: 1s
+      retries: 15
+
+
+  mysqldb:
+    
+    image: mysql:latest
+   
+    restart: unless-stopped
+    
+    env_file: .env
+    
     environment:
       - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
       - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    
     ports:
       - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    
     volumes:
       - $PWD/db:/var/lib/mysql
+    
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-      timeout: 20s
+      timeout: 30s
+      interval: 1s
       retries: 10
 
+
   backend:
+    
     depends_on:
       mysqldb:
         condition: service_healthy
+      rabbit:
+        condition: service_healthy
+    
     image: ishmamruhan/interactive-image-resizer-backend
+    
     restart: on-failure
+    
     env_file: .env
+    
     ports:
       - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    
     environment:
       spring.datasource.url : jdbc:mysql://mysqldb:$MYSQLDB_DOCKER_PORT/$MYSQLDB_DATABASE?useSSL=false&autoReconnect=true&allowPublicKeyRetrieval=true
       spring.datasource.username : $MYSQLDB_USER
       spring.datasource.password : $MYSQLDB_ROOT_PASSWORD
       spring.jpa.properties.hibernate.dialect : org.hibernate.dialect.MySQL8Dialect
       spring.jpa.hibernate.ddl-auto : update
+      spring.rabbitmq.host: rabbit
+
 
   frontend:
+    
     depends_on:
       - backend
+    
     image: ishmamruhan/interactive-image-resizer-frontend
+    
     restart: on-failure
+    
     ports:
       - $ANGULAR_LOCAL_PORT:$ANGULAR_DOCKER_PORT

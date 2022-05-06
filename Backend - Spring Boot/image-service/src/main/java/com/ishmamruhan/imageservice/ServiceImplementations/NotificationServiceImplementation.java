@@ -15,26 +15,24 @@ public class NotificationServiceImplementation implements NotificationService {
     private SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void sendNotification(int type) {
-
-
-        switch (type){
-            case 200:
-                String content="Successfully Uploded+200";
-                messagingTemplate.convertAndSend("/topic/update",new NotificationResponse(content));
-                return;
-
-            case 400:
-                String content2="Something Wrong While Uploading+400";
-                messagingTemplate.convertAndSend("/topic/update",new NotificationResponse(content2));
-                return;
-        }
+    public void sendInfoNotification(String message) {
+        String content = message+"+100";
+        sendMessage(content);
     }
 
     @Override
-    public void sendNotification(String message) {
-        String content3 = message+"+500";
-        messagingTemplate.convertAndSend("/topic/update",new NotificationResponse(content3));
+    public void sendSuccessNotification(String message) {
+        String content = message+"+200";
+        sendMessage(content);
     }
 
+    @Override
+    public void sendErrorNotification(String message) {
+        String content = message+"+400";
+        sendMessage(content);
+    }
+
+    void sendMessage(String message){
+        messagingTemplate.convertAndSend("/topic/update",new NotificationResponse(message));
+    }
 }
