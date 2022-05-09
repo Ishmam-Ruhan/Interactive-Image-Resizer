@@ -19,7 +19,8 @@ services:
       retries: 15
 
     networks:
-      - image_network
+      image_network:
+        ipv4_address: 172.20.0.5
 
   mysqldb:
     
@@ -42,7 +43,8 @@ services:
       retries: 15
 
     networks:
-      - image_network
+      image_network:
+        ipv4_address: 172.20.0.2
 
 
   backend:
@@ -71,7 +73,8 @@ services:
       spring.rabbitmq.host: rabbit
 
     networks:
-      - image_network
+      image_network:
+        ipv4_address: 172.20.0.3
 
   frontend:
     
@@ -82,12 +85,21 @@ services:
     
     restart: on-failure
     
+    environment:
+      BACKEND_BASE_URL: http://172.20.0.3:$SPRING_DOCKER_PORT
+    
     ports:
       - $ANGULAR_LOCAL_PORT:$ANGULAR_DOCKER_PORT
     
     networks:
-      - image_network
+      image_network:
+        ipv4_address: 172.20.0.4
+
 
 
 networks:
-  image_network: {}
+  image_network: 
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
